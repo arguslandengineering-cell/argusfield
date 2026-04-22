@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ARGUS FIELD</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1628">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ARGUS">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root {
+  --bg: #0a1628;
+  --surface: #111f35;
+  --surface2: #162540;
+  --surface3: #1c2d4a;
+  --accent: #00e5b4;
+  --accent2: #ff6b6b;
+  --accent3: #ffd166;
+  --accent4: #74b9ff;
+  --text: #e8f0fe;
+  --muted: #4a6280;
+  --border: #1a2f4a;
+  --green: #00e5b4;
+  --yellow: #ffd166;
+  --red: #ff6b6b;
+  --gray: #4a6280;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-size: 14px;
+}
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background: radial-gradient(ellipse at 30% 0%, rgba(0,229,180,0.05) 0%, transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── HEADER ── */
+.app-header {
+  position:relative; z-index:20;
+  padding: 10px 16px 8px;
+  display:flex; align-items:center; justify-content:space-between;
+  background: rgba(10,22,40,0.97);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+.brand { display:flex; flex-direction:column; }
+.brand-name {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size:20px; letter-spacing:2px; color:var(--accent); line-height:1;
+}
+.brand-sub { font-size:9px; color:var(--muted); letter-spacing:3px; text-transform:uppercase; margin-top:2px; }
+.header-right { display:flex; gap:8px; align-items:center; }
+.site-strip { display:flex; gap:6px; }
+.site-dot {
+  display:flex; align-items:center; gap:3px;
+  font-size:10px; font-weight:600; letter-spacing:0.5px;
+  padding: 3px 8px; border-radius:10px; border:1px solid;
+}
+.site-dot.green { background:rgba(0,229,180,0.1); color:var(--green); border-color:rgba(0,229,180,0.2); }
+.site-dot.yellow { background:rgba(255,209,102,0.1); color:var(--yellow); border-color:rgba(255,209,102,0.2); }
+.site-dot.red { background:rgba(255,107,107,0.1); color:var(--red); border-color:rgba(255,107,107,0.2); }
+.site-dot.gray { background:rgba(74,98,128,0.1); color:var(--gray); border-color:rgba(74,98,128,0.2); }
+
+/* ── NAV ── */
+nav {
+  position:relative; z-index:20;
+  display:flex; background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.nav-tab {
+  flex:1; padding:8px 2px 6px; background:none; border:none;
+  color:var(--muted); font-family:'IBM Plex Sans',sans-serif;
+  font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;
+  cursor:pointer; transition:all 0.2s;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  border-bottom:2px solid transparent;
+}
+.nav-tab .ni { font-size:15px; }
+.nav-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* ── PAGES ── */
+.page { display:none; flex:1; overflow-y:auto; position:relative; z-index:10; padding:12px 14px; flex-direction:column; gap:10px; -webkit-overflow-scrolling:touch; }
+.page.active { display:flex; }
+
+/* ── CARDS ── */
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:14px;
+}
+.card-title {
+  font-family:'Syne',sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:1.5px; text-transform:uppercase; color:var(--accent);
+  margin-bottom:10px; display:flex; align-items:center; gap:6px;
+}
+
+/* ── FORM ELEMENTS ── */
+label { font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:4px; margin-top:10px; }
+label:first-of-type { margin-top:0; }
+input, select, textarea {
+  width:100%; padding:9px 12px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; color:var(--text);
+  font-family:'IBM Plex Sans',sans-serif; font-size:14px;
+  outline:none; transition:border-color 0.2s; appearance:none;
+}
+input:focus, select:focus, textarea:focus { border-color:var(--accent); }
+textarea { resize:vertical; min-height:70px; line-height:1.5; }
+
+/* ── BUTTONS ── */
+.btn {
+  width:100%; padding:12px; border:none; border-radius:12px;
+  font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase; cursor:pointer;
+  transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px;
+}
+.btn:active { transform:scale(0.97); }
+.btn-primary { background:var(--accent); color:#0a1628; }
+.btn-secondary { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+.btn-danger { background:rgba(255,107,107,0.12); color:var(--red); border:1px solid rgba(255,107,107,0.2); }
+.btn-warn { background:rgba(255,209,102,0.12); color:var(--yellow); border:1px solid rgba(255,209,102,0.2); }
+.btn-sm { width:auto; padding:6px 12px; font-size:10px; }
+.btn-row { display:flex; gap:8px; }
+.btn-row .btn { flex:1; }
+
+/* ── STATUS PILLS ── */
+.pill {
+  padding:2px 8px; border-radius:10px; font-size:10px;
+  font-weight:600; letter-spacing:0.5px; text-transform:uppercase; flex-shrink:0;
+}
+.pill-approved { background:rgba(0,229,180,0.12); color:var(--green); }
+.pill-submitted { background:rgba(255,209,102,0.12); color:var(--yellow); }
+.pill-draft { background:rgba(74,98,128,0.12); color:var(--gray); }
+.pill-rejected { background:rgba(255,107,107,0.12); color:var(--red); }
+.pill-revised { background:rgba(116,185,255,0.12); color:var(--accent4); }
+
+/* ── LIST ITEMS ── */
+.list-item {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:12px; cursor:pointer;
+  transition:border-color 0.2s; margin-bottom:6px;
+}
+.list-item:hover { border-color:var(--accent); }
+.list-item-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:4px; }
+.list-item-id { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; }
+.list-item-title { font-size:13px; font-weight:500; line-height:1.3; margin-bottom:4px; }
+.list-item-meta { font-size:11px; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap; }
+.owner-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  background:rgba(0,229,180,0.08); border:1px solid rgba(0,229,180,0.15);
+  border-radius:6px; padding:2px 6px; font-size:10px; color:var(--accent);
+}
+
+/* ── HOME QUICK ACTIONS ── */
+.quick-actions { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.qa-btn {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:14px 8px; text-align:center;
+  cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.qa-btn:active { transform:scale(0.96); border-color:var(--accent); }
+.qa-btn .qa-icon { font-size:22px; }
+.qa-btn .qa-label { font-size:10px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+
+/* ── PERSON CARDS (team view) ── */
+.person-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:12px; display:flex; gap:10px; align-items:flex-start;
+}
+.person-avatar {
+  width:36px; height:36px; border-radius:10px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:14px;
+  background:var(--surface2); color:var(--accent);
+}
+.person-info { flex:1; min-width:0; }
+.person-name { font-weight:600; font-size:13px; }
+.person-role { font-size:10px; color:var(--muted); margin-top:1px; }
+.person-update { font-size:12px; color:var(--text); margin-top:5px; line-height:1.4; }
+.person-status { display:flex; align-items:center; gap:4px; margin-top:4px; }
+.status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.status-dot.green { background:var(--green); }
+.status-dot.yellow { background:var(--yellow); }
+.status-dot.red { background:var(--red); }
+.status-dot.gray { background:var(--gray); }
+.no-checkin { font-size:11px; color:var(--muted); font-style:italic; }
+
+/* ── DIGEST BOX ── */
+.digest-box {
+  background:var(--surface2); border:1px solid rgba(0,229,180,0.2);
+  border-radius:12px; padding:14px; font-size:13px; line-height:1.7;
+  white-space:pre-wrap; word-break:break-word; display:none;
+}
+.digest-box.visible { display:block; }
+
+/* ── PROMPT BOX ── */
+.prompt-box {
+  background:var(--surface2); border:1px solid rgba(0,229,180,0.25);
+  border-radius:12px; padding:14px; font-size:12px; line-height:1.7;
+  white-space:pre-wrap; word-break:break-word; max-height:280px; overflow-y:auto;
+  display:none; color:var(--text);
+}
+.prompt-box.visible { display:block; }
+
+/* ── METRICS ── */
+.metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.metric-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:12px; text-align:center;
+}
+.metric-val { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; line-height:1; margin-bottom:3px; }
+.metric-lbl { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+/* ── BAR CHART ── */
+.bar-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.bar-lbl { font-size:11px; color:var(--muted); width:72px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bar-track { flex:1; height:7px; background:var(--surface2); border-radius:4px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:4px; transition:width 0.8s ease; }
+.bar-num { font-size:11px; font-family:'Syne',sans-serif; font-weight:700; width:20px; text-align:right; }
+
+/* ── STALE / FLAG ITEMS ── */
+.flag-item {
+  background:rgba(255,209,102,0.06); border:1px solid rgba(255,209,102,0.15);
+  border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
+}
+.flag-days { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--yellow); }
+
+/* ── ACTIVITY FEED ── */
+.activity-item {
+  display:flex; gap:8px; align-items:flex-start; padding:8px 0;
+  border-bottom:1px solid var(--border);
+}
+.activity-item:last-child { border-bottom:none; }
+.activity-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:5px; }
+.activity-text { font-size:12px; line-height:1.4; flex:1; }
+.activity-time { font-size:10px; color:var(--muted); flex-shrink:0; }
+
+/* ── DUP WARNING ── */
+.dup-warn {
+  background:rgba(255,209,102,0.08); border:1px solid rgba(255,209,102,0.25);
+  border-radius:10px; padding:10px 12px; font-size:12px; color:var(--yellow);
+  display:none; margin-top:6px; line-height:1.5;
+}
+.dup-warn.visible { display:block; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,0.75); backdrop-filter:blur(4px);
+  padding:16px; overflow-y:auto;
+}
+.modal-overlay.open { display:flex; align-items:flex-start; justify-content:center; padding-top:30px; }
+.modal {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:18px; padding:18px; width:100%; max-width:480px;
+  animation:slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.modal-title { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; color:var(--accent); }
+.modal-close { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:4px 10px; cursor:pointer; font-size:12px; }
+
+/* ── MANAGER UNLOCK ── */
+.manager-section { display:none; }
+.manager-section.unlocked { display:flex; flex-direction:column; gap:10px; }
+.manager-banner {
+  background:rgba(0,229,180,0.08); border:1px solid rgba(0,229,180,0.2);
+  border-radius:10px; padding:8px 12px; font-size:11px; color:var(--accent);
+  text-align:center; letter-spacing:1px;
+}
+
+/* ── CHECKIN FORM ── */
+.checkin-done {
+  background:rgba(0,229,180,0.08); border:1px solid rgba(0,229,180,0.2);
+  border-radius:12px; padding:16px; text-align:center;
+}
+.checkin-done-icon { font-size:32px; margin-bottom:8px; }
+.checkin-done-text { font-size:13px; color:var(--accent); font-weight:500; }
+
+/* ── STATUS COLOR PICKER ── */
+.color-picker { display:flex; gap:8px; margin-top:6px; }
+.color-opt {
+  flex:1; padding:10px 6px; border-radius:10px; border:2px solid transparent;
+  text-align:center; cursor:pointer; transition:all 0.2s; font-size:11px; font-weight:600;
+}
+.color-opt.green { background:rgba(0,229,180,0.1); color:var(--green); }
+.color-opt.yellow { background:rgba(255,209,102,0.1); color:var(--yellow); }
+.color-opt.red { background:rgba(255,107,107,0.1); color:var(--red); }
+.color-opt.selected { border-color:currentColor; }
+
+/* ── UPLOAD DROP ── */
+.file-drop {
+  border:2px dashed var(--border); border-radius:12px; padding:24px 14px;
+  text-align:center; cursor:pointer; transition:all 0.2s; background:var(--surface2);
+}
+.file-drop:hover { border-color:var(--accent); background:rgba(0,229,180,0.04); }
+.file-drop-icon { font-size:28px; margin-bottom:6px; }
+.file-drop-text { font-size:12px; color:var(--muted); }
+.file-name { font-size:12px; color:var(--accent); margin-top:4px; font-weight:500; }
+
+/* ── SECTION LABEL ── */
+.sec-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); padding:2px 0; }
+
+/* ── DIVIDER ── */
+.divider { height:1px; background:var(--border); margin:4px 0; }
+
+/* ── EMPTY STATE ── */
+.empty { text-align:center; padding:32px 16px; color:var(--muted); }
+.empty .ei { font-size:32px; margin-bottom:8px; }
+.empty p { font-size:12px; line-height:1.6; }
+
+/* ── TOAST ── */
+.toast {
+  position:fixed; bottom:20px; left:50%;
+  transform:translateX(-50%) translateY(60px);
+  background:var(--accent); color:#0a1628; padding:10px 20px;
+  border-radius:20px; font-size:12px; font-weight:700;
+  z-index:300; transition:transform 0.3s ease; white-space:nowrap; pointer-events:none;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* ── INSTALL BANNER ── */
+.install-banner {
+  background:rgba(0,229,180,0.08); border:1px solid rgba(0,229,180,0.2);
+  border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px;
+  display:none;
+}
+.install-banner.visible { display:flex; }
+
+/* ── TABS WITHIN PAGE ── */
+.inner-tabs { display:flex; gap:6px; margin-bottom:10px; }
+.inner-tab {
+  flex:1; padding:8px 6px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; color:var(--muted); font-family:'IBM Plex Sans',sans-serif;
+  font-size:11px; font-weight:600; cursor:pointer; text-align:center; transition:all 0.2s;
+}
+.inner-tab.active { background:var(--accent); border-color:var(--accent); color:#0a1628; }
+
+.inner-page { display:none; flex-direction:column; gap:10px; }
+.inner-page.active { display:flex; }
+
+/* ── TOGGLE ── */
+.toggle-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
+.toggle-label { font-size:13px; }
+.toggle { width:40px; height:22px; border-radius:11px; background:var(--surface2); border:1px solid var(--border); position:relative; cursor:pointer; transition:background 0.2s; }
+.toggle.on { background:var(--accent); border-color:var(--accent); }
+.toggle::after { content:''; position:absolute; width:16px; height:16px; border-radius:50%; background:#fff; top:2px; left:2px; transition:left 0.2s; }
+.toggle.on::after { left:20px; }
+
+.gap { display:flex; flex-direction:column; gap:8px; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Detail</div>
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- STATUS EDIT MODAL -->
+<div class="modal-overlay" id="statusModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Update CSW Status</div>
+      <button class="modal-close" onclick="closeStatusModal()">✕</button>
+    </div>
+    <div id="statusModalBody"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="brand">
+    <div class="brand-name">ARGUS FIELD</div>
+    <div class="brand-sub">Planning & Engineering</div>
+  </div>
+  <div class="header-right">
+    <div class="site-strip" id="siteStrip"></div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <button class="nav-tab active" onclick="showPage('home')" id="tab-home"><span class="ni">🏠</span>Home</button>
+  <button class="nav-tab" onclick="showPage('csw')" id="tab-csw"><span class="ni">📋</span>CSW</button>
+  <button class="nav-tab" onclick="showPage('daily')" id="tab-daily"><span class="ni">📰</span>Daily</button>
+  <button class="nav-tab" onclick="showPage('report')" id="tab-report"><span class="ni">📊</span>Report</button>
+  <button class="nav-tab" onclick="showPage('config')" id="tab-config"><span class="ni">⚙️</span>Config</button>
+</nav>
+
+<!-- ════════════════ HOME PAGE ════════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- Install banner -->
+  <div class="install-banner" id="installBanner">
+    <span style="font-size:20px;">📲</span>
+    <div style="flex:1;">
+      <div style="font-size:12px;font-weight:600;">Install ARGUS FIELD</div>
+      <div style="font-size:11px;color:var(--muted);">Add to home screen for full-screen experience</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="triggerInstall()">Install</button>
+  </div>
+
+  <!-- Today's digest -->
+  <div id="digestHomeCard" style="display:none;">
+    <div class="card">
+      <div class="card-title">📰 Today's Digest</div>
+      <div id="digestHomeText" style="font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;"></div>
+    </div>
+  </div>
+
+  <!-- Flags -->
+  <div class="card" id="flagsCard">
+    <div class="card-title">⚠️ Flags</div>
+    <div id="flagsList"><div class="empty"><p>No flags today. All clear.</p></div></div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="quick-actions">
+    <div class="qa-btn" onclick="showPage('daily'); showInnerTab('daily','checkin')">
+      <div class="qa-icon">✏️</div>
+      <div class="qa-label">Update</div>
+    </div>
+    <div class="qa-btn" onclick="showPage('csw'); showInnerTab('csw','new')">
+      <div class="qa-icon">📋</div>
+      <div class="qa-label">CSW</div>
+    </div>
+    <div class="qa-btn" onclick="showPage('csw'); showInnerTab('csw','new'); focusPrompt()">
+      <div class="qa-icon">✨</div>
+      <div class="qa-label">Prompt</div>
+    </div>
+  </div>
+
+  <!-- Activity feed -->
+  <div class="card">
+    <div class="card-title">🕐 Recent Activity</div>
+    <div id="activityFeed">
+      <div class="empty"><p>No activity yet.</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════ CSW PAGE ════════════════ -->
+<div class="page" id="page-csw">
+
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showInnerTab('csw','search')" id="csw-tab-search">🔍 Search</button>
+    <button class="inner-tab" onclick="showInnerTab('csw','new')" id="csw-tab-new">✏️ New</button>
+    <button class="inner-tab" onclick="showInnerTab('csw','upload')" id="csw-tab-upload">📤 Upload</button>
+    <button class="inner-tab" onclick="showInnerTab('csw','list')" id="csw-tab-list">📑 List</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="inner-page active" id="csw-page-search">
+    <div style="position:relative;">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search title, site, type, owner..." oninput="renderSearch()" style="padding-left:34px;" autocomplete="off">
+    </div>
+    <div style="display:flex;gap:6px;">
+      <select id="filterStatus" onchange="renderSearch()" style="flex:1;">
+        <option value="">All Status</option>
+        <option>Draft</option><option>Submitted</option>
+        <option>Approved</option><option>Rejected</option><option>Revised</option>
+      </select>
+      <select id="filterType" onchange="renderSearch()" style="flex:1;">
+        <option value="">All Types</option>
+        <option>Field Issue</option>
+        <option>Policy/System</option>
+        <option>Inter-Department</option>
+      </select>
+    </div>
+    <div id="searchResults"></div>
+  </div>
+
+  <!-- NEW CSW -->
+  <div class="inner-page" id="csw-page-new">
+    <div class="card">
+      <div class="card-title">📋 New CSW</div>
+
+      <label>CSW Type *</label>
+      <select id="cswType">
+        <option value="">Pick a type...</option>
+        <option>Field Issue — One-time problem at site</option>
+        <option>Policy/System — New rule or procedure</option>
+        <option>Inter-Department — Action needed from another dept</option>
+      </select>
+
+      <label>Title *</label>
+      <input type="text" id="cswTitle" placeholder="Short clear title of the issue" oninput="checkDup(); analyzeOwnership();" autocomplete="off">
+      <div class="dup-warn" id="dupWarn"></div>
+
+      <div id="ownershipResult" style="display:none;margin-top:8px;">
+        <div class="sec-label">Detected Ownership</div>
+        <div id="ownershipBadges" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;"></div>
+      </div>
+
+      <label>Site *</label>
+      <select id="cswSite">
+        <option value="">Select site...</option>
+        <option>MNT Phase 1</option><option>MNT Phase 2</option>
+        <option>MNT Phase 3</option><option>MNT Phase 4</option>
+        <option>MH SH</option><option>MH EH</option><option>BCC</option>
+        <option>General / All Sites</option><option>Office</option>
+      </select>
+
+      <label>Department</label>
+      <select id="cswDept">
+        <option value="">Select...</option>
+        <option>Planning & Engineering</option><option>Construction</option>
+        <option>QA/QC</option><option>Finance</option>
+        <option>Admin</option><option>Sales</option><option>Legal</option>
+        <option>Cross-Department</option>
+      </select>
+
+      <label>Situation *</label>
+      <textarea id="cswSituation" placeholder="What happened? What is the problem? Write in any language — keep it short and clear." oninput="analyzeOwnership()"></textarea>
+
+      <label>Impact</label>
+      <textarea id="cswImpact" placeholder="What happens if we don't fix this?" style="min-height:55px;"></textarea>
+
+      <label>Recommendation</label>
+      <textarea id="cswRecommendation" placeholder="What do you suggest we do?" style="min-height:55px;"></textarea>
+
+      <label>Reference (optional)</label>
+      <input type="text" id="cswRef" placeholder="Drawing no., plan ref, prior CSW number...">
+    </div>
+
+    <button class="btn btn-primary" id="genPromptBtn" onclick="generatePrompt()">✨ Generate AI Prompt</button>
+
+    <div id="promptSection" style="display:none;flex-direction:column;gap:8px;">
+      <div class="sec-label">📎 Copy this → paste into Claude or any AI</div>
+      <div class="prompt-box visible" id="promptOutput"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="copyPrompt()">📋 Copy Prompt</button>
+        <button class="btn btn-secondary" onclick="saveDraft()">💾 Save Draft</button>
+      </div>
+      <div style="font-size:11px;color:var(--yellow);line-height:1.5;padding:4px;">
+        ⚠️ After the AI gives you the CSW draft — print it, get signatures, scan as PDF or photo, then upload it in the Upload tab.
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="inner-page" id="csw-page-upload">
+    <div class="card">
+      <div class="card-title">📤 Upload Approved CSW</div>
+
+      <label>CSW Number *</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="upCswNo" placeholder="e.g. CSW-2026-001" style="flex:1;">
+        <button class="btn btn-secondary btn-sm" onclick="autoNum()" style="width:auto;padding:9px 12px;">Auto</button>
+      </div>
+
+      <label>Title (optional — app will use number if blank)</label>
+      <input type="text" id="upTitle" placeholder="Short title">
+
+      <label>Status</label>
+      <select id="upStatus">
+        <option value="Approved">Approved ✅</option>
+        <option value="Submitted">Submitted — Waiting for approval</option>
+        <option value="Rejected">Rejected ❌</option>
+      </select>
+
+      <label>Attach File (PDF or JPEG) *</label>
+      <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+        <div class="file-drop-icon">📄</div>
+        <div class="file-drop-text">Tap to choose PDF or photo</div>
+        <div class="file-name" id="fileName"></div>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg" style="display:none;" onchange="handleFile(event)">
+    </div>
+
+    <button class="btn btn-primary" onclick="uploadCSW()">📤 Upload to Archive</button>
+    <div class="sec-label" style="text-align:center;">Files are stored permanently in the ArgusLand GitHub archive.</div>
+  </div>
+
+  <!-- LIST -->
+  <div class="inner-page" id="csw-page-list">
+    <div style="display:flex;gap:6px;">
+      <select id="listFilter" onchange="renderList()" style="flex:1;">
+        <option value="">All Status</option>
+        <option>Draft</option><option>Submitted</option>
+        <option>Approved</option><option>Rejected</option><option>Revised</option>
+      </select>
+      <select id="listOwner" onchange="renderList()" style="flex:1;">
+        <option value="">All Owners</option>
+        <option>Angely</option><option>Ana</option><option>Gio</option>
+        <option>Oliver</option><option>Charles</option><option>Site-in-Charge</option>
+      </select>
+    </div>
+    <div id="listResults"></div>
+  </div>
+
+</div>
+
+<!-- ════════════════ DAILY PAGE ════════════════ -->
+<div class="page" id="page-daily">
+
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showInnerTab('daily','checkin')" id="daily-tab-checkin">✏️ Check-in</button>
+    <button class="inner-tab" onclick="showInnerTab('daily','team')" id="daily-tab-team">👥 Team</button>
+    <button class="inner-tab" onclick="showInnerTab('daily','digest')" id="daily-tab-digest">📰 Digest</button>
+  </div>
+
+  <!-- CHECK-IN -->
+  <div class="inner-page active" id="daily-page-checkin">
+    <div id="noProfileMsg" style="display:none;">
+      <div class="card">
+        <div class="card-title">👤 Profile Not Set</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Please go to Config → My Profile and set your name and role first. This takes less than a minute.</p>
+        <div style="margin-top:10px;">
+          <button class="btn btn-primary" onclick="showPage('config')">Go to Config →</button>
+        </div>
+      </div>
+    </div>
+    <div id="checkinForm">
+      <div class="card" id="checkinCard">
+        <div class="card-title">✏️ Daily Check-in</div>
+        <div id="checkinQuestions"></div>
+        <div style="margin-top:12px;">
+          <div class="sec-label">Site Status Today</div>
+          <div class="color-picker" id="statusPicker">
+            <div class="color-opt green" onclick="selectStatus('green',this)">🟢 On Track</div>
+            <div class="color-opt yellow" onclick="selectStatus('yellow',this)">🟡 Needs Attention</div>
+            <div class="color-opt red" onclick="selectStatus('red',this)">🔴 Problem</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="submitCheckin()">✅ Submit Check-in</button>
+    </div>
+    <div id="checkinDone" class="checkin-done" style="display:none;">
+      <div class="checkin-done-icon">✅</div>
+      <div class="checkin-done-text">Check-in submitted for today!</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">See the Team tab to view everyone's update.</div>
+    </div>
+  </div>
+
+  <!-- TEAM TODAY -->
+  <div class="inner-page" id="daily-page-team">
+    <div id="teamToday"></div>
+    <button class="btn btn-secondary" onclick="generateDigestPrompt()" style="margin-top:4px;">✨ Build Digest Prompt</button>
+    <div id="digestPromptBox" class="prompt-box" style="margin-top:6px;"></div>
+    <div id="digestPromptActions" style="display:none;flex-direction:column;gap:8px;margin-top:6px;">
+      <button class="btn btn-primary" onclick="copyDigestPrompt()">📋 Copy Digest Prompt</button>
+    </div>
+  </div>
+
+  <!-- DIGEST -->
+  <div class="inner-page" id="daily-page-digest">
+    <div id="digestViewCard">
+      <div id="noDigestMsg" class="empty">
+        <div class="ei">📰</div>
+        <p>No digest published today yet.<br>Charles will publish after check-ins are in.</p>
+      </div>
+      <div id="digestContent" style="display:none;">
+        <div class="card">
+          <div class="card-title">📰 Today's Digest</div>
+          <div id="digestText" style="font-size:13px;line-height:1.7;white-space:pre-wrap;"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Manager only: paste digest -->
+    <div id="publishDigestSection" style="display:none;flex-direction:column;gap:8px;">
+      <div class="divider"></div>
+      <div class="sec-label" style="color:var(--accent);">🔒 Manager: Publish Today's Digest</div>
+      <textarea id="digestInput" placeholder="Paste the AI-generated digest here..." style="min-height:120px;"></textarea>
+      <button class="btn btn-primary" onclick="publishDigest()">📢 Publish to All</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════ REPORT PAGE ════════════════ -->
+<div class="page" id="page-report">
+
+  <!-- Metrics -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-val" style="color:var(--accent);" id="rptTotal">0</div>
+      <div class="metric-lbl">Total CSW</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" style="color:var(--yellow);" id="rptPending">0</div>
+      <div class="metric-lbl">Pending</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" style="color:var(--accent);" id="rptApproved">0</div>
+      <div class="metric-lbl">Approved</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" style="color:var(--accent);font-size:22px;" id="rptRate">—</div>
+      <div class="metric-lbl">Approval Rate</div>
+    </div>
+  </div>
+
+  <!-- Team check-in health -->
+  <div class="card">
+    <div class="card-title">👥 Team Check-in Health</div>
+    <div id="teamHealth"></div>
+  </div>
+
+  <!-- CSW by owner -->
+  <div class="card">
+    <div class="card-title">👤 CSW Load by Owner</div>
+    <div id="ownerChart"></div>
+  </div>
+
+  <!-- CSW by site -->
+  <div class="card">
+    <div class="card-title">🏗️ CSW by Site</div>
+    <div id="siteChart"></div>
+  </div>
+
+  <!-- Stale items -->
+  <div class="card">
+    <div class="card-title">⏰ Stale — No Update 7+ Days</div>
+    <div id="staleItems"></div>
+  </div>
+
+  <!-- Weekly prompt (manager) -->
+  <div id="weeklyPromptSection" style="display:none;flex-direction:column;gap:8px;">
+    <div class="card">
+      <div class="card-title">🔒 Weekly Narrative Prompt</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Builds a prompt from all check-ins and CSW data. Copy → paste into AI → get the weekly report.</p>
+      <button class="btn btn-secondary" onclick="generateWeeklyPrompt()">✨ Build Weekly Prompt</button>
+      <div class="prompt-box" id="weeklyPromptBox" style="margin-top:8px;"></div>
+      <div id="weeklyPromptActions" style="display:none;margin-top:8px;">
+        <button class="btn btn-primary" onclick="copyWeeklyPrompt()">📋 Copy Weekly Prompt</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════ CONFIG PAGE ════════════════ -->
+<div class="page" id="page-config">
+
+  <!-- My Profile -->
+  <div class="card">
+    <div class="card-title">👤 My Profile</div>
+    <label>Your Name *</label>
+    <input type="text" id="cfgMyName" placeholder="e.g. Gio Santos">
+    <label>Your Role (set by manager)</label>
+    <input type="text" id="cfgMyRole" placeholder="e.g. QA/Inspection" readonly style="opacity:0.6;">
+    <label>Your Site</label>
+    <input type="text" id="cfgMySite" placeholder="e.g. MNT Phase 1" readonly style="opacity:0.6;">
+    <div style="margin-top:12px;">
+      <button class="btn btn-primary" onclick="saveProfile()">💾 Save My Profile</button>
+    </div>
+  </div>
+
+  <!-- Manager unlock -->
+  <div class="card">
+    <div class="card-title">🔒 Manager Access</div>
+    <label>Enter Manager Code</label>
+    <div style="display:flex;gap:8px;">
+      <input type="password" id="managerCode" placeholder="••••••" style="flex:1;" onkeydown="if(event.key==='Enter')tryUnlock()">
+      <button class="btn btn-secondary btn-sm" onclick="tryUnlock()" style="width:auto;padding:9px 14px;">Unlock</button>
+    </div>
+  </div>
+
+  <!-- Manager section (hidden until unlocked) -->
+  <div class="manager-section" id="managerSection">
+    <div class="manager-banner">🔓 Manager Mode Active</div>
+
+    <!-- Team roster -->
+    <div class="card">
+      <div class="card-title">👥 Team Roster</div>
+      <div id="teamRoster"></div>
+      <div style="margin-top:10px;">
+        <button class="btn btn-secondary" onclick="addTeamMember()">+ Add Team Member</button>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="btn btn-warn" onclick="generateTeamPrompt()">✨ Team Composition Prompt</button>
+      </div>
+      <div class="prompt-box" id="teamPromptBox" style="margin-top:8px;"></div>
+      <div id="teamPromptActions" style="display:none;margin-top:8px;">
+        <button class="btn btn-primary btn-sm" onclick="copyTeamPrompt()">📋 Copy</button>
+      </div>
+    </div>
+
+    <!-- Ownership keywords -->
+    <div class="card">
+      <div class="card-title">🏷️ Ownership Keywords</div>
+      <div id="keywordsList"></div>
+      <div style="margin-top:10px;">
+        <button class="btn btn-warn" onclick="generateKeywordPrompt()">✨ Discover New Keywords</button>
+      </div>
+      <div class="prompt-box" id="keywordPromptBox" style="margin-top:8px;"></div>
+      <div id="keywordPromptActions" style="display:none;margin-top:8px;flex-direction:column;gap:6px;">
+        <button class="btn btn-primary btn-sm" onclick="copyKeywordPrompt()">📋 Copy Prompt</button>
+        <textarea id="keywordAiOutput" placeholder="Paste AI output here to update keyword list..." style="min-height:60px;"></textarea>
+        <button class="btn btn-secondary btn-sm" onclick="applyKeywordUpdate()">✅ Apply AI Keywords</button>
+      </div>
+    </div>
+
+    <!-- Charles domain -->
+    <div class="card">
+      <div class="card-title">📌 Charles Domain — Bottlenecks</div>
+      <div id="charlesDomain"></div>
+      <div style="margin-top:10px;">
+        <button class="btn btn-warn" onclick="generateBottleneckPrompt()">✨ Bottleneck Analysis Prompt</button>
+      </div>
+      <div class="prompt-box" id="bottleneckPromptBox" style="margin-top:8px;"></div>
+      <div id="bottleneckActions" style="display:none;margin-top:8px;flex-direction:column;gap:6px;">
+        <button class="btn btn-primary btn-sm" onclick="copyBottleneckPrompt()">📋 Copy Prompt</button>
+        <textarea id="toneInput" placeholder="Paste AI tone/urgency adjustment here..." style="min-height:60px;"></textarea>
+        <button class="btn btn-secondary btn-sm" onclick="applyToneUpdate()">✅ Apply Tone Adjustment</button>
+        <div class="sec-label" id="toneStatus"></div>
+      </div>
+    </div>
+
+    <!-- GitHub settings -->
+    <div class="card">
+      <div class="card-title">🔧 GitHub Settings</div>
+      <label>GitHub Username</label>
+      <input type="text" id="cfgUser" placeholder="arguslandengineering-cell">
+      <label>Repository Name</label>
+      <input type="text" id="cfgRepo" placeholder="csw-archive">
+      <label>Personal Access Token</label>
+      <div style="display:flex;gap:8px;">
+        <input type="password" id="cfgToken" placeholder="ghp_xxxxxxxxxxxx" style="flex:1;">
+        <button class="btn btn-secondary btn-sm" onclick="toggleToken()" style="width:auto;padding:9px 10px;">👁</button>
+      </div>
+      <label>Notification Email</label>
+      <input type="email" id="cfgEmail" value="arguslandengineering@gmail.com">
+      <div style="margin-top:12px;gap-sm">
+        <button class="btn btn-primary" onclick="saveGitConfig()">💾 Save GitHub Config</button>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="btn btn-secondary" onclick="syncFromGitHub()">🔄 Sync from GitHub</button>
+      </div>
+    </div>
+
+    <!-- Clear data -->
+    <div class="card">
+      <div class="card-title">🗄️ Data Management</div>
+      <div class="gap">
+        <button class="btn btn-danger" onclick="clearLocal()">🗑 Clear Local Cache</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Install prompt -->
+  <div class="card" id="installCard" style="display:none;">
+    <div class="card-title">📲 Install App</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Install ARGUS FIELD on your home screen for full-screen use without the browser bar.</p>
+    <button class="btn btn-primary" onclick="triggerInstall()">📲 Add to Home Screen</button>
+  </div>
+
+  <div style="text-align:center;font-size:10px;color:var(--muted);padding:6px;">ArgusLand Planning & Engineering · ARGUS FIELD v2.0</div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let cswIndex = JSON.parse(localStorage.getItem('af_csw') || '[]');
+let checkins = JSON.parse(localStorage.getItem('af_checkins') || '{}'); // {date: {name: {...}}}
+let activity = JSON.parse(localStorage.getItem('af_activity') || '[]');
+let digest = JSON.parse(localStorage.getItem('af_digest') || '{}'); // {date: text}
+let gitCfg = JSON.parse(localStorage.getItem('af_git') || '{}');
+let myProfile = JSON.parse(localStorage.getItem('af_profile') || '{}');
+let teamRoster = JSON.parse(localStorage.getItem('af_team') || JSON.stringify([
+  { name:'Gio', role:'QA/Inspection', site:'MNT Phase 1-4' },
+  { name:'Ana', role:'QA/QC Head', site:'MH SH, BCC' },
+  { name:'Angely', role:'BOM/Costing', site:'Office' },
+  { name:'Oliver', role:'Structural Eng', site:'Future Projects' },
+  { name:'Charles', role:'Technical Head', site:'All Sites' }
+]));
+let ownerKeywords = JSON.parse(localStorage.getItem('af_keywords') || JSON.stringify({
+  'Angely': ['bom','cost','material','price','budget','quantity','estimate','costing','change order','payment','quote','quotation','bill'],
+  'Ana': ['qa','quality','land development','drainage','survey','lot','system','policy','procedure','lgu','permit','compliance','in/out','qc'],
+  'Gio': ['ft','finishing','inspection','pag-ibig','coc','punch list','plan detail','as-built','tile','paint','door','window','unit'],
+  'Oliver': ['bt','box type','structural','footing','beam','column','slab','rebar','concrete','design','load','retaining wall','slope'],
+  'Site-in-Charge': ['manpower','equipment','weather','access','delay','excavation','backfill','site condition','contractor','delivery','field'],
+  'Charles': ['process','efficiency','production','bottleneck','system','team','performance','management','overall','department']
+}));
+let appTone = localStorage.getItem('af_tone') || '';
+let selectedFile = null;
+let selectedStatus = 'green';
+let currentPrompt = '';
+let currentDigestPrompt = '';
+let currentWeeklyPrompt = '';
+let currentTeamPrompt = '';
+let currentKeywordPrompt = '';
+let currentBottleneckPrompt = '';
+let isManagerUnlocked = false;
+let deferredInstall = null;
+
+const MANAGER_CODE = '092018';
+const CORE_TEAM = ['Gio','Ana','Angely','Oliver','Charles'];
+const TODAY = () => new Date().toISOString().split('T')[0];
+const FMT_DATE = d => { try { return new Date(d).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}); } catch { return d; } };
+const FMT_TIME = () => new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+
+// Role question sets (Grade 10 level language)
+const ROLE_QUESTIONS = {
+  'QA/Inspection': [
+    'What inspections did you finish today?',
+    'Any issues with Pag-IBIG or documents?',
+    'What is the main thing to check tomorrow?'
+  ],
+  'QA/QC Head': [
+    'What quality issues did you flag today?',
+    'How is the BT or finishing work progressing?',
+    'Any concerns with the current systems or procedures?'
+  ],
+  'BOM/Costing': [
+    'What BOM or cost items did you process today?',
+    'Any material price changes or cost concerns to flag?',
+    'Are all reports up to date?'
+  ],
+  'Structural Eng': [
+    'What design or structural work did you do today?',
+    'Any technical issues blocking progress?',
+    'What is the priority for tomorrow?'
+  ],
+  'Technical Head': [
+    'What is the overall team status today?',
+    'What is the biggest bottleneck right now?',
+    'What needs to be decided or escalated today?'
+  ],
+  'Field': [
+    'What work was done on site today?',
+    'Any problem with manpower, materials, or equipment?',
+    'Is the site moving as planned?'
+  ],
+  'Site Engineer': [
+    'What was accomplished on site today?',
+    'Any delays or site conditions blocking work?',
+    'What is the focus for tomorrow?'
+  ],
+  'Admin': [
+    'What tasks did you complete today?',
+    'Anything waiting on another department?',
+    'What is your priority tomorrow?'
+  ]
+};
+
+const DEFAULT_QUESTIONS = [
+  'What did you finish or accomplish today?',
+  'Is there any problem or blocker?',
+  'What is your focus for tomorrow?'
+];
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'home') renderHome();
+  if (name === 'csw') renderSearch();
+  if (name === 'daily') renderDailyPage();
+  if (name === 'report') renderReport();
+  if (name === 'config') renderConfig();
+}
+
+function showInnerTab(page, tab) {
+  document.querySelectorAll(`#page-${page} .inner-tab`).forEach(t => t.classList.remove('active'));
+  document.querySelectorAll(`#page-${page} .inner-page`).forEach(p => p.classList.remove('active'));
+  const tabEl = document.getElementById(`${page}-tab-${tab}`);
+  const pageEl = document.getElementById(`${page}-page-${tab}`);
+  if (tabEl) tabEl.classList.add('active');
+  if (pageEl) pageEl.classList.add('active');
+}
+
+function focusPrompt() {
+  setTimeout(() => document.getElementById('cswTitle')?.focus(), 300);
+}
+
+// ═══════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════
+function renderHome() {
+  renderSiteStrip();
+  renderFlags();
+  renderActivity();
+  renderDigestHome();
+}
+
+function renderSiteStrip() {
+  const sites = ['MNT','MH','BCC'];
+  const statusMap = getSiteStatuses();
+  const strip = document.getElementById('siteStrip');
+  strip.innerHTML = sites.map(s => {
+    const st = statusMap[s] || 'gray';
+    return `<div class="site-dot ${st}">${s}</div>`;
+  }).join('');
+}
+
+function getSiteStatuses() {
+  const today = TODAY();
+  const todayCheckins = checkins[today] || {};
+  const map = { MNT:'gray', MH:'gray', BCC:'gray' };
+  Object.values(todayCheckins).forEach(c => {
+    const site = (c.site || '').toUpperCase();
+    const status = c.status || 'gray';
+    if (site.includes('MNT')) map.MNT = worstStatus(map.MNT, status);
+    if (site.includes('MH')) map.MH = worstStatus(map.MH, status);
+    if (site.includes('BCC')) map.BCC = worstStatus(map.BCC, status);
+  });
+  return map;
+}
+
+function worstStatus(a, b) {
+  const order = { red:3, yellow:2, green:1, gray:0 };
+  return (order[b] || 0) > (order[a] || 0) ? b : a;
+}
+
+function renderFlags() {
+  const today = TODAY();
+  const todayCheckins = checkins[today] || {};
+  const flags = [];
+
+  // Missing check-ins from core team
+  CORE_TEAM.forEach(name => {
+    if (!todayCheckins[name]) {
+      flags.push({ type:'missing', text:`${name} has not checked in today`, color:'gray' });
+    }
+  });
+
+  // Red status
+  Object.entries(todayCheckins).forEach(([name, c]) => {
+    if (c.status === 'red') {
+      flags.push({ type:'red', text:`🔴 ${name} — ${c.answers?.[0] || 'Problem reported'}`, color:'red' });
+    }
+  });
+
+  // Stale CSWs
+  const now = Date.now();
+  cswIndex.filter(c => c.status !== 'Approved' && c.status !== 'Rejected' && c.dateCreated).forEach(c => {
+    const age = Math.round((now - new Date(c.dateCreated).getTime()) / 86400000);
+    if (age >= 7) {
+      flags.push({ type:'stale', text:`⏰ ${c.number || 'CSW'} stale — ${age} days`, color:'yellow' });
+    }
+  });
+
+  const el = document.getElementById('flagsList');
+  if (flags.length === 0) {
+    el.innerHTML = `<div class="empty"><p>No flags today. All clear. ✅</p></div>`;
+  } else {
+    el.innerHTML = flags.map(f => `
+      <div class="flag-item">
+        <div style="font-size:12px;line-height:1.4;">${f.text}</div>
+        <div class="flag-days" style="color:var(--${f.color === 'red' ? 'red' : f.color === 'yellow' ? 'yellow' : 'muted'});">!</div>
+      </div>
+    `).join('');
+  }
+}
+
+function renderActivity() {
+  const el = document.getElementById('activityFeed');
+  if (activity.length === 0) {
+    el.innerHTML = `<div class="empty"><p>No activity yet.</p></div>`;
+    return;
+  }
+  el.innerHTML = activity.slice(0, 8).map(a => `
+    <div class="activity-item">
+      <div class="activity-dot"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+function renderDigestHome() {
+  const today = TODAY();
+  const d = digest[today];
+  const card = document.getElementById('digestHomeCard');
+  if (d) {
+    card.style.display = 'block';
+    document.getElementById('digestHomeText').innerText = d;
+  } else {
+    card.style.display = 'none';
+  }
+}
+
+function addActivity(text) {
+  activity.unshift({ text, time: FMT_TIME() });
+  if (activity.length > 50) activity = activity.slice(0, 50);
+  localStorage.setItem('af_activity', JSON.stringify(activity));
+}
+
+// ═══════════════════════════════════════════════
+// OWNERSHIP ANALYSIS
+// ═══════════════════════════════════════════════
+function analyzeOwnership() {
+  const title = (document.getElementById('cswTitle')?.value || '').toLowerCase();
+  const situation = (document.getElementById('cswSituation')?.value || '').toLowerCase();
+  const combined = title + ' ' + situation;
+  const found = detectOwners(combined);
+
+  const resultEl = document.getElementById('ownershipResult');
+  const badgesEl = document.getElementById('ownershipBadges');
+  if (!resultEl || !badgesEl) return;
+
+  if (found.length > 0) {
+    resultEl.style.display = 'block';
+    badgesEl.innerHTML = found.map(o =>
+      `<div class="owner-badge">👤 ${o}</div>`
+    ).join('');
+  } else {
+    resultEl.style.display = 'none';
+  }
+}
+
+function detectOwners(text) {
+  const found = [];
+  const t = text.toLowerCase();
+  Object.entries(ownerKeywords).forEach(([owner, keywords]) => {
+    if (keywords.some(k => t.includes(k.toLowerCase()))) {
+      if (!found.includes(owner)) found.push(owner);
+    }
+  });
+  if (found.length === 0) found.push('Charles');
+  return found;
+}
+
+// ═══════════════════════════════════════════════
+// CSW — SEARCH
+// ═══════════════════════════════════════════════
+function renderSearch() {
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const sf = document.getElementById('filterStatus')?.value || '';
+  const tf = document.getElementById('filterType')?.value || '';
+
+  let results = cswIndex.filter(c => {
+    const mq = !q || ['title','type','site','dept','number'].some(k => (c[k]||'').toLowerCase().includes(q));
+    const ms = !sf || c.status === sf;
+    const mt = !tf || (c.type||'').includes(tf.split(' ')[0]);
+    return mq && ms && mt;
+  });
+
+  const el = document.getElementById('searchResults');
+  if (!el) return;
+  if (results.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="ei">🔍</div><p>No results. Try different words.</p></div>`;
+    return;
+  }
+  el.innerHTML = results.map(c => buildCSWCard(c, 'view')).join('');
+}
+
+function renderList() {
+  const sf = document.getElementById('listFilter')?.value || '';
+  const of_ = document.getElementById('listOwner')?.value || '';
+  let results = cswIndex.filter(c => {
+    const ms = !sf || c.status === sf;
+    const mo = !of_ || (c.owners||[]).includes(of_);
+    return ms && mo;
+  });
+  const el = document.getElementById('listResults');
+  if (!el) return;
+  if (results.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="ei">📑</div><p>No items found.</p></div>`;
+    return;
+  }
+  el.innerHTML = results.map(c => buildCSWCard(c, 'edit')).join('');
+}
+
+function buildCSWCard(c, mode) {
+  const owners = (c.owners || ['—']).map(o => `<div class="owner-badge">👤 ${o}</div>`).join('');
+  const editBtn = mode === 'edit'
+    ? `<button class="btn btn-secondary btn-sm" onclick="openStatusEdit('${c.id}');event.stopPropagation();" style="width:auto;padding:5px 10px;margin-top:6px;">✏️ Edit Status</button>
+       <button class="btn btn-warn btn-sm" onclick="genBottleneckItem('${c.id}');event.stopPropagation();" style="width:auto;padding:5px 10px;margin-top:6px;">✨ Bottleneck</button>`
+    : '';
+  return `
+    <div class="list-item" onclick="viewCSW('${c.id}')">
+      <div class="list-item-header">
+        <div class="list-item-id">${c.number || 'DRAFT'}</div>
+        <div class="pill pill-${(c.status||'draft').toLowerCase()}">${c.status || 'Draft'}</div>
+      </div>
+      <div class="list-item-title">${c.title || 'Untitled'}</div>
+      <div class="list-item-meta">
+        <span>${c.type?.split(' ')[0] || '—'}</span>
+        <span>${c.site || '—'}</span>
+        <span>${FMT_DATE(c.dateCreated)}</span>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;">${owners}</div>
+      ${editBtn}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// CSW — VIEW DETAIL
+// ═══════════════════════════════════════════════
+function viewCSW(id) {
+  const c = cswIndex.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('modalTitle').innerText = c.number || 'CSW Draft';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="gap">
+      <div style="font-size:15px;font-weight:600;">${c.title || 'Untitled'}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div class="pill pill-${(c.status||'draft').toLowerCase()}">${c.status||'Draft'}</div>
+        <div style="font-size:11px;color:var(--muted);padding:3px 0;">${c.type||''}</div>
+      </div>
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
+        <div><div class="sec-label">Site</div>${c.site||'—'}</div>
+        <div><div class="sec-label">Dept</div>${c.dept||'—'}</div>
+        <div><div class="sec-label">Prepared By</div>${c.preparedBy||'—'}</div>
+        <div><div class="sec-label">Date</div>${FMT_DATE(c.dateCreated)}</div>
+      </div>
+      ${c.situation ? `<div><div class="sec-label">Situation</div><div style="font-size:12px;color:var(--muted);line-height:1.6;">${c.situation}</div></div>` : ''}
+      <div><div class="sec-label">Owners</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;">${(c.owners||['—']).map(o=>`<div class="owner-badge">👤 ${o}</div>`).join('')}</div></div>
+      ${c.fileUrl ? `<a href="${c.fileUrl}" target="_blank"><button class="btn btn-primary" style="margin-top:4px;">📄 Open / Reprint Signed CSW</button></a>` : ''}
+      ${c.approvalDate ? `<div><div class="sec-label">Approved On</div>${FMT_DATE(c.approvalDate)}</div>` : ''}
+      ${c.rejectionReason ? `<div><div class="sec-label">Rejection Reason</div><div style="font-size:12px;color:var(--red);">${c.rejectionReason}</div></div>` : ''}
+      ${c.revisionFactor ? `<div><div class="sec-label">Revision Factor</div><div style="font-size:12px;color:var(--accent4);">${c.revisionFactor}</div></div>` : ''}
+      ${c.implemented !== undefined ? `<div><div class="sec-label">Implemented</div>${c.implemented ? '✅ Yes — in place' : '⏳ Not yet'}</div>` : ''}
+    </div>`;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('detailModal').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════
+// CSW — STATUS EDIT
+// ═══════════════════════════════════════════════
+function openStatusEdit(id) {
+  const c = cswIndex.find(x => x.id === id);
+  if (!c) return;
+
+  document.getElementById('statusModalBody').innerHTML = `
+    <div class="gap">
+      <div style="font-size:13px;font-weight:500;">${c.title}</div>
+      <div><div class="sec-label">Current Status</div>
+        <div class="pill pill-${(c.status||'draft').toLowerCase()}" style="display:inline-block;margin-top:3px;">${c.status||'Draft'}</div>
+      </div>
+      <div>
+        <label>New Status</label>
+        <select id="newStatus" onchange="toggleStatusFields()">
+          <option value="Draft" ${c.status==='Draft'?'selected':''}>Draft</option>
+          <option value="Submitted" ${c.status==='Submitted'?'selected':''}>Submitted — Waiting for approval</option>
+          <option value="Approved" ${c.status==='Approved'?'selected':''}>Approved ✅</option>
+          <option value="Rejected" ${c.status==='Rejected'?'selected':''}>Rejected ❌</option>
+          <option value="Revised" ${c.status==='Revised'?'selected':''}>Revised 🔄</option>
+        </select>
+      </div>
+      <div id="rejectionField" style="display:none;">
+        <label>Reason for Rejection *</label>
+        <textarea id="rejectionReason" placeholder="What was missing or wrong?" style="min-height:60px;">${c.rejectionReason||''}</textarea>
+      </div>
+      <div id="revisionField" style="display:none;">
+        <label>What was revised / what got it approved?</label>
+        <textarea id="revisionFactor" placeholder="What changed that helped it move forward?" style="min-height:60px;">${c.revisionFactor||''}</textarea>
+      </div>
+      <div id="approvedField" style="display:none;">
+        <label>Date Approved</label>
+        <input type="date" id="approvalDate" value="${c.approvalDate||TODAY()}">
+        <div class="toggle-row" style="margin-top:8px;">
+          <div class="toggle-label" style="font-size:13px;">Already implemented / in place?</div>
+          <div class="toggle ${c.implemented?'on':''}" id="implToggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveStatusEdit('${id}')">✅ Save Status</button>
+    </div>`;
+
+  toggleStatusFields();
+  document.getElementById('statusModal').classList.add('open');
+}
+
+function toggleStatusFields() {
+  const val = document.getElementById('newStatus')?.value;
+  const rj = document.getElementById('rejectionField');
+  const rv = document.getElementById('revisionField');
+  const ap = document.getElementById('approvedField');
+  if (rj) rj.style.display = val === 'Rejected' ? 'block' : 'none';
+  if (rv) rv.style.display = val === 'Revised' ? 'block' : 'none';
+  if (ap) ap.style.display = val === 'Approved' ? 'block' : 'none';
+}
+
+function saveStatusEdit(id) {
+  const idx = cswIndex.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  const newStatus = document.getElementById('newStatus').value;
+  const old = cswIndex[idx];
+  cswIndex[idx] = {
+    ...old,
+    status: newStatus,
+    rejectionReason: document.getElementById('rejectionReason')?.value || old.rejectionReason,
+    revisionFactor: document.getElementById('revisionFactor')?.value || old.revisionFactor,
+    approvalDate: newStatus === 'Approved' ? (document.getElementById('approvalDate')?.value || TODAY()) : old.approvalDate,
+    implemented: document.getElementById('implToggle')?.classList.contains('on')
+  };
+  saveCSW();
+  addActivity(`Status updated: ${old.number || old.title} → ${newStatus}`);
+  closeStatusModal();
+  renderList();
+  showToast(`✅ Status updated to ${newStatus}`);
+}
+
+function closeStatusModal() { document.getElementById('statusModal').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════
+// CSW — DUPLICATE CHECK
+// ═══════════════════════════════════════════════
+function checkDup() {
+  const title = (document.getElementById('cswTitle')?.value || '').toLowerCase();
+  const el = document.getElementById('dupWarn');
+  if (!el) return;
+  if (title.length < 5) { el.classList.remove('visible'); return; }
+
+  const words = title.split(' ').filter(w => w.length > 3);
+  const matches = cswIndex.filter(c => {
+    const ct = (c.title || '').toLowerCase();
+    return words.some(w => ct.includes(w));
+  }).slice(0, 2);
+
+  if (matches.length > 0) {
+    el.innerHTML = `⚠️ A similar CSW may already exist. Check before continuing — but it can still be a different situation.<br><br>
+      ${matches.map(m => `→ <strong>${m.number||'Draft'}</strong>: ${m.title} (${m.status||'Draft'})`).join('<br>')}`;
+    el.classList.add('visible');
+  } else {
+    el.classList.remove('visible');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CSW — PROMPT GENERATOR
+// ═══════════════════════════════════════════════
+function generatePrompt() {
+  const type = document.getElementById('cswType')?.value;
+  const title = document.getElementById('cswTitle')?.value.trim();
+  const site = document.getElementById('cswSite')?.value;
+  const dept = document.getElementById('cswDept')?.value;
+  const situation = document.getElementById('cswSituation')?.value.trim();
+  const impact = document.getElementById('cswImpact')?.value.trim();
+  const recommendation = document.getElementById('cswRecommendation')?.value.trim();
+  const ref = document.getElementById('cswRef')?.value.trim();
+
+  if (!type || !title || !situation) {
+    showToast('⚠️ Fill in Type, Title, and Situation first');
+    return;
+  }
+
+  const owners = detectOwners(title + ' ' + situation);
+  const cswNo = genDraftNumber();
+  const preparedBy = myProfile.name || '[Staff Name]';
+
+  const prompt = `You are a professional technical writer for ArgusLand, Inc., a residential subdivision developer in Damilag, Manolo Fortich, Bukidnon, Philippines.
+
+Write a complete, formal Completed Staff Work (CSW) document. Use clear, direct language that anyone with a high school education can understand. Avoid technical jargon unless necessary.
+
+---
+CSW REFERENCE: ${cswNo} (Draft)
+DATE: ${new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'})}
+TYPE: ${type.split(' — ')[0]}
+TITLE: ${title}
+SITE: ${site || 'Not specified'}
+DEPARTMENT: ${dept || 'Planning & Engineering'}
+PREPARED BY: ${preparedBy}
+REVIEWED BY: [Reviewing Engineer]
+NOTED BY: Engr. Charles Rey B. Casiño — Technical Head
+APPROVED BY: Jose Edison O. Argayoso III / Edward V. Argayoso — President
+---
+
+SITUATION:
+${situation}
+${impact ? `\nIMPACT:\n${impact}` : ''}
+${recommendation ? `\nRECOMMENDATION:\n${recommendation}` : ''}
+${ref ? `\nREFERENCES:\n${ref}` : ''}
+---
+
+INSTRUCTIONS:
+1. Write these sections: I. Background, II. Discussion, III. Recommendation, IV. Action Required
+2. ${type.includes('Policy') ? 'Frame the recommendation as a standing policy for all future occurrences of this situation.' : ''}
+3. ${type.includes('Inter-Department') ? 'Clearly state which department must act and what the deadline is.' : ''}
+4. ${type.includes('Field') ? 'Be specific about the corrective action and who is responsible.' : ''}
+5. End with a signature block using the signatories listed above
+6. Use plain, clear language — Grade 10 reading level
+7. Output plain text only — no markdown symbols`;
+
+  currentPrompt = prompt;
+  document.getElementById('promptOutput').innerText = prompt;
+  document.getElementById('promptSection').style.display = 'flex';
+  document.getElementById('promptSection').scrollIntoView({ behavior:'smooth' });
+  addActivity(`Prompt generated: ${title}`);
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(currentPrompt).then(() => showToast('📋 Prompt copied! Paste into AI.')).catch(() => showToast('⚠️ Copy failed — select text manually'));
+}
+
+function saveDraft() {
+  const title = document.getElementById('cswTitle')?.value.trim();
+  if (!title) { showToast('Add a title first'); return; }
+  const combined = title + ' ' + (document.getElementById('cswSituation')?.value || '');
+  const owners = detectOwners(combined);
+  const entry = {
+    id: 'draft_' + Date.now(),
+    number: genDraftNumber(),
+    title,
+    type: document.getElementById('cswType')?.value?.split(' — ')[0] || '',
+    site: document.getElementById('cswSite')?.value || '',
+    dept: document.getElementById('cswDept')?.value || '',
+    preparedBy: myProfile.name || '',
+    situation: document.getElementById('cswSituation')?.value || '',
+    status: 'Draft',
+    owners,
+    dateCreated: new Date().toISOString(),
+    fileUrl: null
+  };
+  cswIndex.unshift(entry);
+  saveCSW();
+  addActivity(`Draft saved: ${title} — Owner: ${owners.join(', ')}`);
+  showToast('💾 Draft saved!');
+  updateHeaderBadges();
+}
+
+function genDraftNumber() {
+  const yr = new Date().getFullYear();
+  const n = String(cswIndex.filter(c => (c.number||'').includes(String(yr))).length + 1).padStart(3,'0');
+  return `CSW-${yr}-${n}`;
+}
+
+// ═══════════════════════════════════════════════
+// CSW — UPLOAD
+// ═══════════════════════════════════════════════
+function autoNum() { document.getElementById('upCswNo').value = genDraftNumber(); }
+
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!['application/pdf','image/jpeg','image/jpg'].includes(file.type)) {
+    showToast('⚠️ Only PDF or JPEG allowed'); return;
+  }
+  selectedFile = file;
+  document.getElementById('fileName').innerText = '✅ ' + file.name;
+}
+
+const fileDrop = document.getElementById('fileDrop');
+fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.style.borderColor='var(--accent)'; });
+fileDrop.addEventListener('dragleave', () => { fileDrop.style.borderColor=''; });
+fileDrop.addEventListener('drop', e => {
+  e.preventDefault(); fileDrop.style.borderColor='';
+  const f = e.dataTransfer.files[0];
+  if (f) { selectedFile = f; document.getElementById('fileName').innerText = '✅ ' + f.name; }
+});
+
+async function uploadCSW() {
+  const no = document.getElementById('upCswNo')?.value.trim();
+  const title = document.getElementById('upTitle')?.value.trim() || no;
+  const status = document.getElementById('upStatus')?.value || 'Approved';
+
+  if (!no || !selectedFile) { showToast('⚠️ CSW number and file are required'); return; }
+  if (!gitCfg.token || !gitCfg.user || !gitCfg.repo) {
+    showToast('⚠️ Set up GitHub in Config first'); showPage('config'); return;
+  }
+
+  showToast('⏳ Uploading...');
+  try {
+    const b64 = await fileToBase64(selectedFile);
+    const ext = selectedFile.name.split('.').pop();
+    const safeName = no.replace(/[^a-zA-Z0-9\-_]/g,'_') + '_' + Date.now() + '.' + ext;
+    const path = `csw-files/${safeName}`;
+
+    const res = await fetch(`https://api.github.com/repos/${gitCfg.user}/${gitCfg.repo}/contents/${path}`, {
+      method:'PUT',
+      headers:{ 'Authorization':`token ${gitCfg.token}`, 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        message:`Upload CSW: ${no} - ${title}`,
+        content: b64,
+        committer:{ name: myProfile.name || 'ArgusLand Staff', email: gitCfg.email || 'arguslandengineering@gmail.com' }
+      })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
+    const data = await res.json();
+
+    const owners = detectOwners(title);
+    const entry = {
+      id: 'csw_' + Date.now(), number: no, title, status,
+      type: '', site: '', dept: '',
+      owners, dateCreated: new Date().toISOString(),
+      approvalDate: status === 'Approved' ? TODAY() : null,
+      fileUrl: data.content.html_url, filePath: path,
+      uploadedBy: myProfile.name || 'Staff'
+    };
+
+    const existing = cswIndex.findIndex(c => c.number === no);
+    if (existing >= 0) cswIndex[existing] = { ...cswIndex[existing], ...entry };
+    else cswIndex.unshift(entry);
+
+    saveCSW();
+    await pushIndex();
+    addActivity(`CSW uploaded: ${no} — ${status}`);
+    showToast('✅ Uploaded and archived!');
+    selectedFile = null;
+    document.getElementById('fileName').innerText = '';
+    document.getElementById('upCswNo').value = '';
+    document.getElementById('upTitle').value = '';
+    updateHeaderBadges();
+  } catch(e) { showToast('❌ Upload failed: ' + e.message); }
+}
+
+async function pushIndex() {
+  if (!gitCfg.token) return;
+  const path = 'csw-index.json';
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(cswIndex, null, 2))));
+  try {
+    const check = await fetch(`https://api.github.com/repos/${gitCfg.user}/${gitCfg.repo}/contents/${path}`, {
+      headers:{ 'Authorization':`token ${gitCfg.token}` }
+    });
+    const existing = check.ok ? await check.json() : null;
+    await fetch(`https://api.github.com/repos/${gitCfg.user}/${gitCfg.repo}/contents/${path}`, {
+      method:'PUT',
+      headers:{ 'Authorization':`token ${gitCfg.token}`, 'Content-Type':'application/json' },
+      body: JSON.stringify({ message:'Update CSW index', content, sha: existing?.sha, committer:{ name:'ARGUS FIELD', email:'arguslandengineering@gmail.com' } })
+    });
+  } catch(e) { console.warn('Index push failed:', e); }
+}
+
+// ═══════════════════════════════════════════════
+// CSW — BOTTLENECK PER ITEM
+// ═══════════════════════════════════════════════
+function genBottleneckItem(id) {
+  const c = cswIndex.find(x => x.id === id);
+  if (!c) return;
+  const now = Date.now();
+  const age = c.dateCreated ? Math.round((now - new Date(c.dateCreated).getTime()) / 86400000) : 0;
+  const prompt = `You are a construction project intelligence assistant for ArgusLand, Inc.
+
+Analyze this specific CSW item and write ONE paragraph (maximum 5 sentences) that covers:
+1. What is currently happening with this item
+2. How long it has been pending and what that means for the project
+3. What is likely blocking it from moving forward
+4. What the recommended next step is
+5. If left unresolved, what risk it creates
+
+Keep the language simple and direct — Grade 10 reading level.
+
+CSW DETAILS:
+Number: ${c.number || 'Draft'}
+Title: ${c.title}
+Type: ${c.type || 'Not specified'}
+Site: ${c.site || 'Not specified'}
+Status: ${c.status || 'Draft'}
+Owner: ${(c.owners||[]).join(', ')}
+Days pending: ${age}
+Situation: ${c.situation || 'Not provided'}
+${c.rejectionReason ? `Rejection reason: ${c.rejectionReason}` : ''}
+${c.revisionFactor ? `Revision notes: ${c.revisionFactor}` : ''}`;
+
+  navigator.clipboard.writeText(prompt).then(() => showToast('📋 Bottleneck prompt copied!')).catch(() => {
+    document.getElementById('modalTitle').innerText = 'Bottleneck Prompt';
+    document.getElementById('modalBody').innerHTML = `<div class="prompt-box visible" style="display:block;">${prompt}</div><button class="btn btn-primary" style="margin-top:8px;" onclick="navigator.clipboard.writeText(\`${prompt.replace(/`/g,"'")}\`).then(()=>showToast('Copied!'))">📋 Copy</button>`;
+    document.getElementById('detailModal').classList.add('open');
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DAILY — CHECK-IN
+// ═══════════════════════════════════════════════
+function renderDailyPage() {
+  const today = TODAY();
+  const todayCheckins = checkins[today] || {};
+  const name = myProfile.name;
+
+  // No profile
+  if (!name) {
+    document.getElementById('noProfileMsg').style.display = 'block';
+    document.getElementById('checkinForm').style.display = 'none';
+    document.getElementById('checkinDone').style.display = 'none';
+  } else if (todayCheckins[name]) {
+    document.getElementById('noProfileMsg').style.display = 'none';
+    document.getElementById('checkinForm').style.display = 'none';
+    document.getElementById('checkinDone').style.display = 'block';
+  } else {
+    document.getElementById('noProfileMsg').style.display = 'none';
+    document.getElementById('checkinForm').style.display = 'block';
+    document.getElementById('checkinDone').style.display = 'none';
+    buildCheckinQuestions();
+  }
+
+  renderTeamToday();
+  renderDigestView();
+
+  // Show publish section for manager
+  const ps = document.getElementById('publishDigestSection');
+  if (ps) ps.style.display = isManagerUnlocked ? 'flex' : 'none';
+}
+
+function buildCheckinQuestions() {
+  const role = myProfile.role || 'Field';
+  const questions = ROLE_QUESTIONS[role] || DEFAULT_QUESTIONS;
+  const el = document.getElementById('checkinQuestions');
+  el.innerHTML = questions.map((q, i) => `
+    <div style="margin-top:${i===0?'0':'12px'};">
+      <label>${q}</label>
+      <input type="text" id="ci_q${i}" placeholder="Your answer..." autocomplete="off">
+    </div>
+  `).join('');
+}
+
+function selectStatus(color, el) {
+  selectedStatus = color;
+  document.querySelectorAll('.color-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function submitCheckin() {
+  const name = myProfile.name;
+  if (!name) { showToast('Set your profile first'); return; }
+
+  const role = myProfile.role || 'Field';
+  const questions = ROLE_QUESTIONS[role] || DEFAULT_QUESTIONS;
+  const answers = questions.map((q, i) => {
+    const val = document.getElementById(`ci_q${i}`)?.value.trim();
+    return val || 'No update';
+  });
+
+  const today = TODAY();
+  if (!checkins[today]) checkins[today] = {};
+  checkins[today][name] = {
+    name, role, site: myProfile.site || '',
+    questions, answers, status: selectedStatus,
+    time: new Date().toISOString()
+  };
+
+  localStorage.setItem('af_checkins', JSON.stringify(checkins));
+  addActivity(`Check-in submitted: ${name} — ${selectedStatus === 'green' ? '🟢' : selectedStatus === 'yellow' ? '🟡' : '🔴'}`);
+  showToast('✅ Check-in submitted!');
+  document.getElementById('checkinForm').style.display = 'none';
+  document.getElementById('checkinDone').style.display = 'block';
+  renderTeamToday();
+}
+
+function renderTeamToday() {
+  const today = TODAY();
+  const todayCheckins = checkins[today] || {};
+  const el = document.getElementById('teamToday');
+  if (!el) return;
+
+  const allNames = [...new Set([...CORE_TEAM, ...Object.keys(todayCheckins)])];
+
+  el.innerHTML = allNames.map(name => {
+    const c = todayCheckins[name];
+    const initials = name.slice(0,2).toUpperCase();
+    if (!c) {
+      return `<div class="person-card" style="margin-bottom:6px;">
+        <div class="person-avatar">${initials}</div>
+        <div class="person-info">
+          <div class="person-name">${name}</div>
+          <div class="person-role">${getTeamMemberRole(name)}</div>
+          <div class="no-checkin">⚫ No check-in today</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="person-card" style="margin-bottom:6px;">
+      <div class="person-avatar">${initials}</div>
+      <div class="person-info">
+        <div class="person-name">${name}</div>
+        <div class="person-role">${c.role || ''} · ${c.site || ''}</div>
+        ${c.answers?.map((a,i) => `<div class="person-update"><span style="color:var(--muted);font-size:11px;">${c.questions?.[i]?.slice(0,30) || 'Q'+(i+1)}: </span>${a}</div>`).join('') || ''}
+        <div class="person-status">
+          <div class="status-dot ${c.status||'gray'}"></div>
+          <span style="font-size:11px;color:var(--muted);">${c.status==='green'?'On Track':c.status==='yellow'?'Needs Attention':c.status==='red'?'Problem':'No status'}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getTeamMemberRole(name) {
+  const m = teamRoster.find(t => t.name === name);
+  return m ? `${m.role} · ${m.site}` : 'Team Member';
+}
+
+// ═══════════════════════════════════════════════
+// DAILY — DIGEST
+// ═══════════════════════════════════════════════
+function generateDigestPrompt() {
+  const today = TODAY();
+  const todayCheckins = checkins[today] || {};
+  const entries = Object.values(todayCheckins);
+
+  if (entries.length === 0) { showToast('No check-ins yet today'); return; }
+
+  const green = entries.filter(c => c.status === 'green');
+  const yellow = entries.filter(c => c.status === 'yellow');
+  const red = entries.filter(c => c.status === 'red');
+  const missing = CORE_TEAM.filter(n => !todayCheckins[n]);
+
+  const stale = cswIndex.filter(c => {
+    if (c.status === 'Approved' || c.status === 'Rejected') return false;
+    const age = c.dateCreated ? Math.round((Date.now() - new Date(c.dateCreated).getTime()) / 86400000) : 0;
+    return age >= 7;
+  });
+
+  const prompt = `You are the intelligence assistant for ArgusLand Planning & Engineering Department.
+
+Create a clear, professional Daily Digest for ${new Date().toLocaleDateString('en-PH',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}.
+
+Use this format:
+📌 TOP ACTIONS TODAY
+📍 SITE STATUS
+✅ WINS / PROGRESS
+⚠️ FLAGS & CONCERNS
+🔵 SUPPORT NEEDED
+📋 OPEN CSW SUMMARY
+
+Keep language simple — Grade 10 reading level. Be direct and useful. Maximum 300 words.
+
+---
+CHECK-IN DATA:
+
+🟢 ON TRACK (${green.length}):
+${green.map(c => `${c.name} (${c.role}/${c.site}): ${c.answers?.join(' | ')}`).join('\n') || 'None'}
+
+🟡 NEEDS ATTENTION (${yellow.length}):
+${yellow.map(c => `${c.name} (${c.role}/${c.site}): ${c.answers?.join(' | ')}`).join('\n') || 'None'}
+
+🔴 PROBLEMS (${red.length}):
+${red.map(c => `${c.name} (${c.role}/${c.site}): ${c.answers?.join(' | ')}`).join('\n') || 'None'}
+
+⚫ NO CHECK-IN: ${missing.join(', ') || 'All submitted'}
+
+STALE CSW ITEMS (${stale.length}):
+${stale.map(c => `${c.number}: ${c.title} — ${Math.round((Date.now()-new Date(c.dateCreated).getTime())/86400000)} days`).join('\n') || 'None'}
+
+TOTAL OPEN CSW: ${cswIndex.filter(c=>c.status!=='Approved'&&c.status!=='Rejected').length}`;
+
+  currentDigestPrompt = prompt;
+  const box = document.getElementById('digestPromptBox');
+  const actions = document.getElementById('digestPromptActions');
+  box.innerText = prompt;
+  box.classList.add('visible');
+  if (actions) actions.style.display = 'flex';
+}
+
+function copyDigestPrompt() {
+  navigator.clipboard.writeText(currentDigestPrompt).then(() => showToast('📋 Digest prompt copied!')).catch(() => showToast('⚠️ Copy failed'));
+}
+
+function publishDigest() {
+  const text = document.getElementById('digestInput')?.value.trim();
+  if (!text) { showToast('Paste the AI digest first'); return; }
+  const today = TODAY();
+  digest[today] = text;
+  localStorage.setItem('af_digest', JSON.stringify(digest));
+  addActivity(`Daily Digest published by ${myProfile.name || 'Manager'}`);
+  showToast('📢 Digest published to all!');
+  document.getElementById('digestInput').value = '';
+  renderDigestView();
+  renderDigestHome();
+}
+
+function renderDigestView() {
+  const today = TODAY();
+  const d = digest[today];
+  document.getElementById('noDigestMsg').style.display = d ? 'none' : 'block';
+  const dc = document.getElementById('digestContent');
+  if (d) {
+    dc.style.display = 'block';
+    document.getElementById('digestText').innerText = d;
+  } else {
+    dc.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// REPORT
+// ═══════════════════════════════════════════════
+function renderReport() {
+  const total = cswIndex.length;
+  const approved = cswIndex.filter(c => c.status === 'Approved').length;
+  const pending = cswIndex.filter(c => c.status !== 'Approved' && c.status !== 'Rejected').length;
+  const rate = total > 0 ? Math.round((approved/total)*100) : 0;
+
+  document.getElementById('rptTotal').innerText = total;
+  document.getElementById('rptPending').innerText = pending;
+  document.getElementById('rptApproved').innerText = approved;
+  document.getElementById('rptRate').innerText = total > 0 ? rate + '%' : '—';
+
+  renderTeamHealth();
+  renderBarChartEl('ownerChart', countBy('owners', true), 'var(--accent)');
+  renderBarChartEl('siteChart', countBy('site'), 'var(--accent3)');
+  renderStaleItems();
+
+  const ws = document.getElementById('weeklyPromptSection');
+  if (ws) ws.style.display = isManagerUnlocked ? 'flex' : 'none';
+}
+
+function renderTeamHealth() {
+  const today = TODAY();
+  const todayCheckins = checkins[today] || {};
+  const el = document.getElementById('teamHealth');
+  el.innerHTML = CORE_TEAM.map(name => {
+    const c = todayCheckins[name];
+    const dot = c ? c.status || 'gray' : 'gray';
+    const label = c ? (c.status === 'green' ? 'On Track' : c.status === 'yellow' ? 'Needs Attention' : 'Problem') : 'No check-in';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+      <div class="status-dot ${dot}"></div>
+      <div style="flex:1;font-size:13px;font-weight:500;">${name}</div>
+      <div style="font-size:11px;color:var(--muted);">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function countBy(field, isArray) {
+  const counts = {};
+  cswIndex.forEach(c => {
+    if (isArray) {
+      (c[field] || ['Unknown']).forEach(v => { counts[v] = (counts[v]||0) + 1; });
+    } else {
+      const v = c[field] || 'Unknown';
+      counts[v] = (counts[v]||0) + 1;
+    }
+  });
+  return counts;
+}
+
+function renderBarChartEl(id, counts, color) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const max = entries.length > 0 ? Math.max(...entries.map(e=>e[1])) : 1;
+  if (entries.length === 0) { el.innerHTML = `<div style="font-size:12px;color:var(--muted);">No data yet.</div>`; return; }
+  el.innerHTML = entries.map(([lbl,val]) => `
+    <div class="bar-row">
+      <div class="bar-lbl" title="${lbl}">${lbl.length > 10 ? lbl.slice(0,10)+'…' : lbl}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round((val/max)*100)}%;background:${color};"></div></div>
+      <div class="bar-num" style="color:${color};">${val}</div>
+    </div>`).join('');
+}
+
+function renderStaleItems() {
+  const now = Date.now();
+  const stale = cswIndex.filter(c => {
+    if (c.status === 'Approved' || c.status === 'Rejected') return false;
+    const age = c.dateCreated ? Math.round((now - new Date(c.dateCreated).getTime()) / 86400000) : 0;
+    return age >= 7;
+  });
+  const el = document.getElementById('staleItems');
+  if (stale.length === 0) { el.innerHTML = `<div class="empty" style="padding:12px;"><p>No stale items. ✅</p></div>`; return; }
+  el.innerHTML = stale.map(c => {
+    const age = Math.round((now - new Date(c.dateCreated).getTime()) / 86400000);
+    return `<div class="flag-item">
+      <div>
+        <div style="font-size:12px;font-weight:500;">${c.title}</div>
+        <div style="font-size:11px;color:var(--muted);">${c.number||'Draft'} · ${c.site||'—'} · ${(c.owners||[]).join(', ')}</div>
+      </div>
+      <div class="flag-days">${age}d</div>
+    </div>`;
+  }).join('');
+}
+
+// Weekly prompt
+function generateWeeklyPrompt() {
+  const today = TODAY();
+  const allCheckins = Object.entries(checkins).sort().slice(-7);
+  const summary = allCheckins.map(([date, dayData]) =>
+    `${date}:\n` + Object.values(dayData).map(c => `  ${c.name}: ${c.answers?.join(' | ')} [${c.status}]`).join('\n')
+  ).join('\n\n');
+
+  const prompt = `You are the intelligence assistant for ArgusLand Planning & Engineering.
+
+Write a clear Weekly Health Report covering the past 7 days. Use this format:
+1. TEAM HEALTH SUMMARY (per person, one line each)
+2. SITE STATUS (MNT, MH SH, MH EH, BCC)
+3. KEY WINS THIS WEEK
+4. TOP CONCERNS & BOTTLENECKS
+5. CSW COMPLIANCE SUMMARY
+6. RECOMMENDED PRIORITIES FOR NEXT WEEK
+
+Keep language simple — Grade 10 level. Be direct. Maximum 400 words.
+
+---
+WEEKLY CHECK-IN DATA:
+${summary || 'No check-ins recorded'}
+
+CSW SUMMARY:
+Total: ${cswIndex.length}
+Approved: ${cswIndex.filter(c=>c.status==='Approved').length}
+Pending: ${cswIndex.filter(c=>c.status!=='Approved'&&c.status!=='Rejected').length}
+Stale 7+ days: ${cswIndex.filter(c=>{ if(c.status==='Approved'||c.status==='Rejected')return false; const age=c.dateCreated?Math.round((Date.now()-new Date(c.dateCreated).getTime())/86400000):0; return age>=7; }).length}
+
+OWNERS WITH MOST OPEN ITEMS:
+${Object.entries(countBy('owners',true)).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([o,n])=>`${o}: ${n} open`).join('\n')}`;
+
+  currentWeeklyPrompt = prompt;
+  const box = document.getElementById('weeklyPromptBox');
+  const actions = document.getElementById('weeklyPromptActions');
+  box.innerText = prompt;
+  box.classList.add('visible');
+  if (actions) actions.style.display = 'block';
+}
+
+function copyWeeklyPrompt() {
+  navigator.clipboard.writeText(currentWeeklyPrompt).then(() => showToast('📋 Weekly prompt copied!')).catch(() => showToast('⚠️ Copy failed'));
+}
+
+// ═══════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════
+function renderConfig() {
+  document.getElementById('cfgMyName').value = myProfile.name || '';
+  document.getElementById('cfgMyRole').value = myProfile.role || '';
+  document.getElementById('cfgMySite').value = myProfile.site || '';
+  if (gitCfg.user) document.getElementById('cfgUser').value = gitCfg.user;
+  if (gitCfg.repo) document.getElementById('cfgRepo').value = gitCfg.repo;
+  if (gitCfg.token) document.getElementById('cfgToken').value = gitCfg.token;
+  if (gitCfg.email) document.getElementById('cfgEmail').value = gitCfg.email;
+  renderTeamRoster();
+  renderKeywordsList();
+  renderCharlesDomain();
+
+  const ic = document.getElementById('installCard');
+  if (ic) ic.style.display = deferredInstall ? 'block' : 'none';
+}
+
+function saveProfile() {
+  const name = document.getElementById('cfgMyName')?.value.trim();
+  if (!name) { showToast('Name is required'); return; }
+  myProfile = { ...myProfile, name };
+  localStorage.setItem('af_profile', JSON.stringify(myProfile));
+  showToast('✅ Profile saved!');
+}
+
+function tryUnlock() {
+  const code = document.getElementById('managerCode')?.value;
+  if (code === MANAGER_CODE) {
+    isManagerUnlocked = true;
+    document.getElementById('managerSection').classList.add('unlocked');
+    document.getElementById('publishDigestSection').style.display = 'flex';
+    document.getElementById('weeklyPromptSection').style.display = 'flex';
+    showToast('🔓 Manager mode active');
+    document.getElementById('managerCode').value = '';
+  } else {
+    showToast('❌ Wrong code');
+  }
+}
+
+function renderTeamRoster() {
+  const el = document.getElementById('teamRoster');
+  if (!el) return;
+  el.innerHTML = teamRoster.map((m, i) => `
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:6px;">
+      <div style="display:flex;gap:8px;margin-bottom:6px;">
+        <input type="text" value="${m.name}" onchange="teamRoster[${i}].name=this.value;saveTeam();" placeholder="Name" style="flex:1;">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <select onchange="teamRoster[${i}].role=this.value;saveTeam();updateMemberRole('${m.name}',this.value);" style="flex:1;">
+          ${Object.keys(ROLE_QUESTIONS).map(r => `<option ${m.role===r?'selected':''}>${r}</option>`).join('')}
+          <option ${!Object.keys(ROLE_QUESTIONS).includes(m.role)?'selected':''}>Field</option>
+        </select>
+        <input type="text" value="${m.site}" onchange="teamRoster[${i}].site=this.value;saveTeam();" placeholder="Site" style="flex:1;">
+        <button class="btn btn-danger btn-sm" onclick="removeTeamMember(${i})" style="width:auto;padding:6px 10px;">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function addTeamMember() {
+  teamRoster.push({ name:'New Member', role:'Field', site:'—' });
+  saveTeam();
+  renderTeamRoster();
+}
+
+function removeTeamMember(i) {
+  teamRoster.splice(i, 1);
+  saveTeam();
+  renderTeamRoster();
+}
+
+function saveTeam() {
+  localStorage.setItem('af_team', JSON.stringify(teamRoster));
+}
+
+function updateMemberRole(name, role) {
+  if (myProfile.name === name) {
+    myProfile.role = role;
+    localStorage.setItem('af_profile', JSON.stringify(myProfile));
+  }
+}
+
+function generateTeamPrompt() {
+  const today = TODAY();
+  const recentActivity = activity.slice(0, 15).map(a => a.text).join('\n');
+  const prompt = `You are an HR and operations advisor for ArgusLand, Inc.
+
+Review the current team composition and recent activity, then suggest any adjustments to roles, workload balance, or team structure.
+
+Consider: who is overloaded, who might benefit from new responsibilities, and if the current role assignments match the actual work being done.
+
+CURRENT TEAM:
+${teamRoster.map(m => `${m.name} — ${m.role} — Site: ${m.site}`).join('\n')}
+
+RECENT ACTIVITY (last 15 actions):
+${recentActivity || 'No activity recorded'}
+
+CSW LOAD BY OWNER:
+${Object.entries(countBy('owners',true)).map(([o,n])=>`${o}: ${n} CSW items`).join('\n')}
+
+Output: 3-5 specific, actionable suggestions. Keep it simple and direct.`;
+
+  currentTeamPrompt = prompt;
+  const box = document.getElementById('teamPromptBox');
+  const actions = document.getElementById('teamPromptActions');
+  box.innerText = prompt; box.classList.add('visible');
+  if (actions) actions.style.display = 'block';
+}
+
+function copyTeamPrompt() {
+  navigator.clipboard.writeText(currentTeamPrompt).then(() => showToast('📋 Team prompt copied!')).catch(()=>showToast('⚠️ Copy failed'));
+}
+
+function renderKeywordsList() {
+  const el = document.getElementById('keywordsList');
+  if (!el) return;
+  el.innerHTML = Object.entries(ownerKeywords).map(([owner, kws]) => `
+    <div style="margin-bottom:10px;">
+      <div class="sec-label" style="color:var(--accent);margin-bottom:4px;">👤 ${owner}</div>
+      <input type="text" value="${kws.join(', ')}"
+        onchange="ownerKeywords['${owner}']=this.value.split(',').map(s=>s.trim()).filter(Boolean);saveKeywords();"
+        style="font-size:12px;">
+    </div>`).join('');
+}
+
+function saveKeywords() {
+  localStorage.setItem('af_keywords', JSON.stringify(ownerKeywords));
+}
+
+function generateKeywordPrompt() {
+  const recentTitles = cswIndex.slice(0,20).map(c => c.title + (c.situation ? ' — ' + c.situation.slice(0,60) : '')).join('\n');
+  const prompt = `You are a keyword analyst for ArgusLand Planning & Engineering.
+
+Review the recent CSW titles and situations below. Suggest new keywords to add to each owner's keyword list for better automatic ownership tagging.
+
+CURRENT OWNERS AND KEYWORDS:
+${Object.entries(ownerKeywords).map(([o,k])=>`${o}: ${k.join(', ')}`).join('\n')}
+
+RECENT CSW DATA:
+${recentTitles || 'No CSW data yet'}
+
+Output: For each owner, list only NEW keywords not already in their list. Format:
+OWNER_NAME: keyword1, keyword2, keyword3
+
+Keep keywords short (1-3 words). Focus on construction and engineering terms used in Bukidnon subdivision development.`;
+
+  currentKeywordPrompt = prompt;
+  const box = document.getElementById('keywordPromptBox');
+  const actions = document.getElementById('keywordPromptActions');
+  box.innerText = prompt; box.classList.add('visible');
+  if (actions) actions.style.display = 'flex';
+}
+
+function copyKeywordPrompt() {
+  navigator.clipboard.writeText(currentKeywordPrompt).then(() => showToast('📋 Keyword prompt copied!')).catch(()=>showToast('⚠️ Copy failed'));
+}
+
+function applyKeywordUpdate() {
+  const text = document.getElementById('keywordAiOutput')?.value.trim();
+  if (!text) { showToast('Paste AI output first'); return; }
+  const lines = text.split('\n');
+  lines.forEach(line => {
+    const parts = line.split(':');
+    if (parts.length >= 2) {
+      const owner = parts[0].trim();
+      const newKws = parts[1].split(',').map(k=>k.trim()).filter(Boolean);
+      if (ownerKeywords[owner]) {
+        ownerKeywords[owner] = [...new Set([...ownerKeywords[owner], ...newKws])];
+      }
+    }
+  });
+  saveKeywords();
+  renderKeywordsList();
+  showToast('✅ Keywords updated!');
+  document.getElementById('keywordAiOutput').value = '';
+}
+
+function renderCharlesDomain() {
+  const el = document.getElementById('charlesDomain');
+  if (!el) return;
+  const unowned = cswIndex.filter(c => (c.owners||[]).length === 0 || (c.owners||[]).includes('Charles'));
+  const stale = cswIndex.filter(c => {
+    if (c.status === 'Approved' || c.status === 'Rejected') return false;
+    const age = c.dateCreated ? Math.round((Date.now()-new Date(c.dateCreated).getTime())/86400000) : 0;
+    return age >= 7;
+  });
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div class="metric-card"><div class="metric-val" style="color:var(--accent);font-size:22px;">${unowned.length}</div><div class="metric-lbl">Charles Domain Items</div></div>
+      <div class="metric-card"><div class="metric-val" style="color:var(--yellow);font-size:22px;">${stale.length}</div><div class="metric-lbl">Stale / Escalated</div></div>
+    </div>
+    ${appTone ? `<div style="background:rgba(0,229,180,0.06);border:1px solid rgba(0,229,180,0.15);border-radius:8px;padding:8px;font-size:11px;color:var(--muted);line-height:1.5;"><strong style="color:var(--accent);">Active Tone Adjustment:</strong><br>${appTone.slice(0,120)}...</div>` : ''}`;
+}
+
+function generateBottleneckPrompt() {
+  const stale = cswIndex.filter(c => {
+    if (c.status === 'Approved' || c.status === 'Rejected') return false;
+    const age = c.dateCreated ? Math.round((Date.now()-new Date(c.dateCreated).getTime())/86400000) : 0;
+    return age >= 7;
+  });
+  const today = TODAY();
+  const todayCheckins = checkins[today] || {};
+  const redFlags = Object.values(todayCheckins).filter(c => c.status === 'red');
+  const missing = CORE_TEAM.filter(n => !todayCheckins[n]);
+
+  const prompt = `You are a construction operations advisor for ArgusLand, Inc. — Charles Rey Casiño, Technical Head.
+
+Analyze the current bottlenecks and team performance, then:
+1. Write a 2-paragraph bottleneck analysis (what is blocking production and efficiency)
+2. Suggest a tone and urgency level for communicating these issues to the team (formal/direct/urgent/supportive — pick the right mix)
+3. Write 3 specific next actions Charles should take this week
+
+Keep language simple — Grade 10 level. Be honest and constructive.
+
+CURRENT SITUATION:
+Stale CSW items (${stale.length}):
+${stale.map(c=>`${c.number}: ${c.title} — ${Math.round((Date.now()-new Date(c.dateCreated).getTime())/86400000)} days — Owner: ${(c.owners||[]).join(', ')}`).join('\n')||'None'}
+
+Today's red flags (${redFlags.length}):
+${redFlags.map(c=>`${c.name}: ${c.answers?.join(' | ')}`).join('\n')||'None'}
+
+Missing check-ins: ${missing.join(', ')||'None'}
+
+CSW compliance rate: ${cswIndex.length > 0 ? Math.round((cswIndex.filter(c=>c.status==='Approved').length/cswIndex.length)*100) : 0}%
+
+Note: At the end of your output, write a section called TONE ADJUSTMENT that starts with "TONE:" on its own line, followed by 1-2 sentences describing the tone and urgency Charles should apply to team communications this week.`;
+
+  currentBottleneckPrompt = prompt;
+  const box = document.getElementById('bottleneckPromptBox');
+  const actions = document.getElementById('bottleneckActions');
+  box.innerText = prompt; box.classList.add('visible');
+  if (actions) actions.style.display = 'flex';
+}
+
+function copyBottleneckPrompt() {
+  navigator.clipboard.writeText(currentBottleneckPrompt).then(() => showToast('📋 Bottleneck prompt copied!')).catch(()=>showToast('⚠️ Copy failed'));
+}
+
+function applyToneUpdate() {
+  const text = document.getElementById('toneInput')?.value.trim();
+  if (!text) { showToast('Paste AI output first'); return; }
+  const toneMatch = text.match(/TONE:(.*?)(?:\n|$)/i);
+  appTone = toneMatch ? toneMatch[1].trim() : text.slice(0, 200);
+  localStorage.setItem('af_tone', appTone);
+  document.getElementById('toneStatus').innerText = '✅ Tone adjustment saved: ' + appTone.slice(0,80) + '...';
+  renderCharlesDomain();
+  showToast('✅ Tone adjustment applied');
+  document.getElementById('toneInput').value = '';
+}
+
+function saveGitConfig() {
+  gitCfg = {
+    user: document.getElementById('cfgUser')?.value.trim(),
+    repo: document.getElementById('cfgRepo')?.value.trim(),
+    token: document.getElementById('cfgToken')?.value.trim(),
+    email: document.getElementById('cfgEmail')?.value.trim()
+  };
+  localStorage.setItem('af_git', JSON.stringify(gitCfg));
+  showToast('✅ GitHub config saved');
+}
+
+function toggleToken() {
+  const f = document.getElementById('cfgToken');
+  f.type = f.type === 'password' ? 'text' : 'password';
+}
+
+async function syncFromGitHub() {
+  if (!gitCfg.user || !gitCfg.repo) { showToast('⚠️ Set GitHub config first'); return; }
+  showToast('🔄 Syncing...');
+  try {
+    const url = `https://raw.githubusercontent.com/${gitCfg.user}/${gitCfg.repo}/main/csw-index.json?t=${Date.now()}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Index not found on GitHub');
+    const data = await res.json();
+    cswIndex = data;
+    localStorage.setItem('af_csw', JSON.stringify(cswIndex));
+    updateHeaderBadges();
+    showToast('✅ Synced! ' + cswIndex.length + ' CSW records loaded.');
+  } catch(e) { showToast('⚠️ Sync failed — ' + e.message); }
+}
+
+function clearLocal() {
+  if (!confirm('Clear all local data? GitHub files are not deleted.')) return;
+  ['af_csw','af_checkins','af_activity','af_digest'].forEach(k => localStorage.removeItem(k));
+  cswIndex = []; checkins = {}; activity = []; digest = {};
+  updateHeaderBadges();
+  showToast('🗑 Local data cleared');
+}
+
+// ═══════════════════════════════════════════════
+// HEADER BADGES
+// ═══════════════════════════════════════════════
+function updateHeaderBadges() {
+  renderSiteStrip();
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function saveCSW() { localStorage.setItem('af_csw', JSON.stringify(cswIndex)); }
+
+async function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerText = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Close modals on overlay click
+['detailModal','statusModal'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ═══════════════════════════════════════════════
+// PWA INSTALL
+// ═══════════════════════════════════════════════
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstall = e;
+  document.getElementById('installBanner').classList.add('visible');
+  const ic = document.getElementById('installCard');
+  if (ic) ic.style.display = 'block';
+});
+
+function triggerInstall() {
+  if (deferredInstall) {
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(() => {
+      deferredInstall = null;
+      document.getElementById('installBanner').classList.remove('visible');
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════
+// SERVICE WORKER
+// ═══════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(e => console.log('SW error', e));
+  });
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+renderHome();
+renderSearch();
+</script>
+</body>
+</html>
